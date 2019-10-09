@@ -1,12 +1,15 @@
 setClass("Package2Class", 
-	representation=representation(
-		param = "numeric"
-	)
-)
+         slots = c(
+             param = "numeric"
+         ))
 
 setGeneric("score", function(x, ...) standardGeneric("score"))
 
-setMethod("score", "Package2Class", function(x, ...){ -x@param })
+setMethod("score", "Package2Class",
+          function(x, ...) {
+              -x@param
+          })
 
-c2 = new("Package2Class", param=10)
+c2 <- new("Package2Class", param=10)
+
 print(score(c2))
