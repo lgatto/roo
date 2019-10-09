@@ -50,3 +50,9 @@ Ref.tex: Ref.Rnw
 clean:
 	rm -f $(LATEXFILES)
 	rm -rf figure
+
+roo-material.zip: roo.pdf
+	cp -r scripts roo-material
+	cp roo.pdf roo-material
+	zip roo-material.zip roo-material/*
+	rm -r roo-material
