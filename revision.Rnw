@@ -23,7 +23,7 @@ Simple function with 4 arguments:
 <<function-example, echo=TRUE>>=
 # Function to calculate area of rectangle
 area <- function(x1, y1, x2, y2){
-  abs(x2-x1) * abs(y2-y1)
+  abs(x2 - x1) * abs(y2 - y1)
 }
 area(0, 0, 5, 5)
 @ 
@@ -159,12 +159,11 @@ class(table(1:4, 1:4))
 \begin{frame}{Recommended coding standards}
   \begin{block}{Coding standards}
     \begin{itemize}
-    \item Use \texttt{<-} for assignment rather than \texttt{=}.
-    \item Avoid long lines (80 characters).
-    \item Use spaces for identation (2 or 4).
-    \item No semi-colomns (unless you have several expression in a line).
-    \item Start names with upper case for classes, lower for the rest.
-    \item Use syntax highlighting
+    \item The usual ones when writing code.
+    \end{itemize}
+    For OO:
+    \begin{itemize}    
+    \item Upper case for class names, lower for the rest.
     \end{itemize}
   \end{block}
 \end{frame}

@@ -14,42 +14,43 @@ options(width = 60)
 % input to readFasta()
 \begin{frame}[fragile]
 
-\begin{block}{\code{readFasta()} input file}
-We will start with the implementation of \code{readFasta()}. This function should load the data 
-from a FASTA file and somehow represent it in \R. 
-\bigskip
-
-A sample FASTA file:
-\begin{Verbatim}[frame=single, xleftmargin=5mm, xrightmargin=5mm]
-> example dna sequence
-agcatacgacgactacgacactacgacatcagacactacagactactac
-gactacagacatcagacactacatatttacatcatcagagattatatta
-acatcagacatcgacacatcatcatcagcatcat
-\end{Verbatim}
-\smallskip
-\end{block}
-
-\begin{block}{Sequence description}
-Notice that a sequence is described by the: 
-\begin{itemize}
-	\item name (\code{example dna sequence})
-	\item nucleotide sequence
-	\item sequence alphabet (in case of DNA ATGC, for RNA AUGC)
-\end{itemize}
-\end{block}
-
+  \begin{block}{\code{readFasta()} input file}
+    We will start with the implementation of \code{readFasta()}. This function should load the data 
+    from a FASTA file and somehow represent it in \R. 
+  \end{block}
+  \begin{Verbatim}[xleftmargin=2mm, xrightmargin=2mm]
+    > example dna sequence
+    agcatacgacgactacgacactacgacatcagacactacagactactac
+    gactacagacatcagacactacatatttacatcatcagagattatatta
+    acatcagacatcgacacatcatcatcagcatcat
+  \end{Verbatim}
+  
+  \begin{block}{Sequence description}
+    Notice that a sequence is described by the: 
+    \begin{itemize}
+    \item name (\code{example dna sequence})
+    \item nucleotide sequence
+    \item sequence alphabet (in case of DNA ATGC, for RNA AUGC)
+    \end{itemize}
+  \end{block}
+  
+  \exercise Write a function that parses the fasta file and returns a
+  list containing the different items defining a sequence.
+  
 \end{frame}
+
 
 % Defining a class in S4
 \begin{frame}[fragile]{Defining S4 classes}
 
 \begin{block}{Defining S4 class}
-  Each class in S4 needs to be defined before it can be used. At this stage data types and inheritance are specified.
+  Each class in S4 needs to be defined before it can be used. At this
+  stage data types and inheritance are specified.
 \end{block}
 
 <<GenericSeq-S4,echo=TRUE, tidy = FALSE>>=
 setClass("GenericSeq",
-         representation = representation(
+         slots = c(
            id = "character",
            sequence =  "character",
            alphabet = "character"
@@ -77,9 +78,9 @@ class("hello")
   \end{block}
 <<make-obj1,echo=TRUE, tidy = FALSE>>=
 genseq <- new("GenericSeq", 
-              id="sequence name", 
-              sequence="AGATACCCCGAAACGA",
-              alphabet=c("A", "C", "G", "T")
+              id = "sequence name", 
+              sequence = "AGATACCCCGAAACGA",
+              alphabet = c("A", "C", "G", "T")
               )
 @
 \end{frame}
@@ -94,44 +95,56 @@ slot(genseq, "id")
   \end{scriptsize}
 \end{frame}
 
-% simple readFasta()
-\begin{frame}[fragile]{Naive \code{readFasta()} implementation}
-  \begin{block}{readFasta() implementation}
-    Read in a sequence from FASTA file and return the \code{id, sequence} and \code{alphabet} in a list:
+\begin{frame}[fragile]{}
+  \begin{block}{\code{readFasta()} implementation (2)}
+    \exercise Read in a sequence from FASTA file and return an object
+    of class \code{GenericSeq}, as shown below.
   \end{block}
 
-\begin{scriptsize}
-<<readFasta-S3, echo=TRUE>>=
+  \begin{scriptsize}
+<<echo = FALSE>>=
 readFasta <- function(infile){
   lines <- readLines(infile)
-  header <- grep("^>", lines) 
-  if ( length(header) > 1 ) {
+  header <- grep("^>", lines)
+  if (length(header) > 1) {
     warning("Reading first sequence only.")
     lines <- lines[header[1]:(header[2]-1)]
     header <- header[1]
-  }  
-  id <- sub("^> *","",lines[header],perl=TRUE)
-  sequence <- toupper(paste(lines[(header+1):length(lines)],collapse=""))
-  alphabet <- unique(strsplit(sequence,"")[[1]])  
+  }
+  .id <- sub("^> *", "", lines[header], perl = TRUE)
+  .sequence <- toupper(paste(lines[(header + 1):length(lines)],
+                             collapse = ""))
+  .alphabet <- toupper(unique(strsplit(.sequence, "")[[1]]))
   
-  return.value <- new("GenericSeq", id=id, sequence=sequence, alphabet=alphabet)
-
-  return.value
+  new("GenericSeq",
+      id = .id,
+      alphabet = .alphabet,
+      sequence = .sequence)
 }
 @
-\end{scriptsize}
-\end{frame}
-
-% inspect S4 objects and introduce methods
-
-\begin{frame}[fragile]{S4 object from readFasta()}
-  \begin{scriptsize}
+    
 <<readFasta-use,echo=TRUE>>=
 s <- readFasta("aDnaSeq.fasta")
 s
 @
 \end{scriptsize}
 \end{frame}
+
+\begin{frame}[fragile]{Defining S4 methods}
+
+  \begin{block}{S4 accessor methods}
+    It is considered bad practice to use \Rfunction{@} in your code to
+    access slots because it breaks the division between the internal
+    class implementation and class usage.
+    
+    \smallskip
+    
+    Instead, create \textbf{getter} and \textbf{setter} methods for
+    all slots you want to expose.
+  \end{block}
+
+\end{frame}
+
 
 % Making generics
 \begin{frame}[shrink]{Writing S3/S4 methods: introducing Generics}
@@ -140,15 +153,16 @@ s
 \end{center}
 \end{frame}
 
-
 % S4 methods - getters and setters
 \begin{frame}[fragile]{Defining S4 methods}
+
   \begin{block}{When a generic does not exist already}
     If a generic \Rfunction{id()} does not exist, we need to create it to be able
     to use our method. 
     
     \smallskip
-    We create our (hidden) implementation with \Rfunction{setMethod()}. 
+    
+    We then create our implementation with \Rfunction{setMethod()}. 
   \end{block}
 
 <<s4-accessors,echo=TRUE, tidy=FALSE>>=
@@ -176,12 +190,19 @@ id(genseq)
 
 \begin{scriptsize}
 <<s4-methods,echo=TRUE, tidy = FALSE>>=
-setGeneric("rev", function(x) standardGeneric("rev"))
-setMethod("rev", "GenericSeq", function(x) 
-          paste(rev(unlist(strsplit(x@sequence, ""))), 
-                collapse=""))         
+rev
 @
 \end{scriptsize}
+\end{frame}
+
+\begin{frame}[fragile]{Defining S4 methods}
+
+<<s4-methods1,echo=TRUE, tidy = FALSE>>=
+rev
+setMethod("rev", "GenericSeq", function(x) 
+          paste(rev(unlist(strsplit(x@sequence, ""))), 
+                collapse = ""))
+@
 \end{frame}
 
 \begin{frame}[fragile]
@@ -192,15 +213,7 @@ showMethods("rev")
 @   
 \end{frame}
 
-\begin{frame}[fragile]
-	\begin{block}{S4 accessor methods}
-    It is considered bad practice to use \Rfunction{@} in your code to access slots. 
-    It breaks the division between the internal class implementation and class usage. 
-    
-    \smallskip
-    Instead, create getter and setter methods for all slots you want to expose.
-  \end{block}
-
+\begin{frame}[fragile]{Replacement methods}
   \begin{scriptsize}
 <<s4-accessor2, tidy = FALSE>>=
 setGeneric("id<-", 
@@ -221,7 +234,7 @@ id(genseq)
 
 % S4 first batch of exercises
 \begin{frame}[fragile]{S4 introspection}
-  \begin{block}{\exercise (code: \code{01_basic_S4.R})}
+  \begin{block}{\exercise}
     \small
     Try the following introspection functions: 
   \end{block}
@@ -241,7 +254,7 @@ isGeneric("rev")
 \end{frame}
 
 \begin{frame}[fragile]
-\begin{block}{\exercise (code as above, solution: \code{01_basic_S4_solution.R})}
+\begin{block}{\exercise}
 \small
 Lets complete our \code{GenericSeq} implementation with some more methods.
 Implement getter/setter method \code{seq()} and getter only \code{alphabet()}.
@@ -350,9 +363,9 @@ print(genseq)
 % S4 methods - initialize
 \begin{frame}[fragile]
 \begin{block}{Special methods - \code{initialize()}}
-  We might need to do some special processing on object creation. We can
-  do this with a custom \code{initialize()} method. \\
-  Use named arguments with default values (otherwise class checking might fail).
+  We might need to do some special processing on object creation. We
+  can do this with a custom \code{initialize()} method. \\ Use named
+  arguments with default values (otherwise class checking might fail).
 \end{block}
 
 \begin{scriptsize}
@@ -366,6 +379,12 @@ setMethod("initialize", "GenericSeq",
     })	
 show(new("GenericSeq", id="new seq.", alphabet=c("A", "T"), sequence="atatta"))
 @
+
+
+\textbf{Tip:} Define constructor functions (like \code{readFasta})
+and manually initialise the slots there, which avoids the need to a
+\code{initialize} method in many cases.
+
 \end{scriptsize}
 \end{frame}
 
@@ -476,7 +495,8 @@ readFasta <- function(infile){
       object in the way that will render it inconsistent (e.g. assign 
       an RNA sequence to an object of class \code{DnaSeq}).       
       \smallskip
-      First lets make sure each new object is consistent, e.g. that alphabet matches sequence.
+      Lets make sure each new object is consistent, e.g. that alphabet
+      matches sequence.
 \end{small}
 \end{block}
 
@@ -499,7 +519,8 @@ setClass("GenericSeq",
          })
 @         
 \end{scriptsize}
-
+\textbf{Tip:} Use \code{setValidity} to define the validity outside of the class
+definition.
 \end{frame}
 
 % Validity in assignment
@@ -555,10 +576,10 @@ and what if: \\
 \end{block}
 
 
-\begin{block}{\exercise (code as above, solution: \code{02_transcribe_solution.R)}}
-\small
-Implement a new method \code{transcribe()} of \code{DnaSeq}. This method should take a
-\code{DnaSeq}, replace the T's with U's and return a \code{RnaSeq} object.
+\begin{block}{\exercise}
+\small Implement a new method \code{transcribe()} of
+\code{DnaSeq}. This method should take a \code{DnaSeq}, replace the
+T's with U's and return a \code{RnaSeq} object.
 \end{block}
 
 

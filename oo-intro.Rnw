@@ -42,9 +42,9 @@ options(width = 60)
       \begin{scriptsize}          
 <<procedural-area,echo=TRUE, tidy = FALSE>>=
 area <- 
-  function(x1,y1,x2,y2){
-    abs(x2-x1)*abs(y2-y1)
-  }
+  function(x1, y1, x2, y2) {
+      abs(x2 - x1) * abs(y2 - y1)
+}
 area(0, 0, 5, 5)
 @ 
 \end{scriptsize}

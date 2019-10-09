@@ -1,4 +1,4 @@
-# Load in a single sequence from a fasta file
+## Load in a single sequence from a fasta file
 readFasta <- function(infile){
   lines <- readLines(infile)
   header <- grep("^>", lines)
@@ -10,12 +10,12 @@ readFasta <- function(infile){
   }
   
   # extract the first sequence
-  id <- sub("^> *","",lines[header],perl=TRUE)
-  sequence <- toupper(paste(lines[(header+1):length(lines)],collapse=""))
-  alphabet <- unique(strsplit(sequence,"")[[1]])
+  id <- sub("^> *","",lines[header], perl = TRUE)
+  sequence <- toupper(paste(lines[(header + 1):length(lines)], collapse = ""))
+  alphabet <- unique(strsplit(sequence, "")[[1]])
 
   # make the return object and assign class  
-  return.value <- list(id=id, sequence=sequence, alphabet=alphabet)
+  return.value <- list(id = id, sequence = sequence, alphabet = alphabet)
   class(return.value) <- "GenericSeq"
   
   return.value
@@ -24,11 +24,11 @@ readFasta <- function(infile){
 #### define S3 methods
 
 # generics
-id <- function(x, ...){ UseMethod("id") }
+id <- function(x, ...) { UseMethod("id") }
 
 # methods
-id.GenericSeq <- function(x, ...){ x$id } 
-seq.GenericSeq = function(x, ...){ x$seq }
+id.GenericSeq <- function(x, ...) { x$id }
+seq.GenericSeq = function(x, ...) { x$seq }
 
 ##### Test code
 s <- readFasta("aDnaSeq.fasta")

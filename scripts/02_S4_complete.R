@@ -28,11 +28,11 @@ readFasta <- function(infile){
 
 #### S4 class definition
 setClass("GenericSeq",
-         representation = representation(
-           id = "character",
-           alphabet = "character",
-           sequence =  "character",
-           "VIRTUAL"),
+         slots = c(
+             id = "character",
+             alphabet = "character",
+             sequence =  "character"),
+         contains = "VIRTUAL",
          validity = function(object) {
            isValid <- TRUE
            if (nchar(object@sequence)>0) {
@@ -45,7 +45,7 @@ setClass("GenericSeq",
          })
 
 setClass("DnaSeq",
-         contains="GenericSeq",
+         contains = "GenericSeq",
          prototype = prototype(
            id = paste("my DNA sequence",date()),
            alphabet = c("A","C","G","T"),
@@ -62,19 +62,15 @@ setClass("RnaSeq",
 
 ### S4 methods
 
-# generics
-
-setGeneric("rev", function(x) standardGeneric("rev"))
+## generics
 setGeneric("id", function(object, ...) standardGeneric("id"))
 setGeneric("id<-", function(object,value) standardGeneric("id<-"))
 setGeneric("alphabet", function(object, ...) standardGeneric("alphabet"))
 
 ## There is already a S3 'seq' method (see ?seq),
 ## although not a generic one (see isGeneric(seq))
-setGeneric("seq", function(...) standardGeneric("seq"))
-setGeneric("seq<-", function(object,value) standardGeneric("seq<-"))
-setGeneric("print", function(x,...) standardGeneric("print"))
-setGeneric("comp",function(object,...) standardGeneric("comp"))
+setGeneric("seq<-", function(object, value) standardGeneric("seq<-"))
+setGeneric("comp", function(object, ...) standardGeneric("comp"))
 
 # methods
 setMethod("rev", "GenericSeq",

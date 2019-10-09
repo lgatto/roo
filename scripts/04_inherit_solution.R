@@ -1,4 +1,3 @@
-
 source("04_inherit.R")
 
 #### S3 methods
@@ -7,7 +6,10 @@ comp.RnaSeq <- function(x, ...) chartr("ACGU","UGCA", seq(x))
 
 #### Test code
 
-s.rna <- structure(list(id="RNA sequence", sequence="AUGCUAGUAC", alphabet=c("A","C","G","U")), class="GenericSeq")
+s.rna <- structure(list(id = "RNA sequence",
+                        sequence = "AUGCUAGUAC",
+                        alphabet = c("A","C","G","U")),
+                   class = "GenericSeq")
 s.rna <- setSeqSubtype(s.rna)
 
 print(s.rna)

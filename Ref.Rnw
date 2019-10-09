@@ -100,7 +100,7 @@ Seq <- setRefClass("Seq",
 \begin{frame}[fragile]
 \begin{scriptsize}
 <<RefClass-example,echo=TRUE, tidy=FALSE>>=
-s <- Seq$new(id="foo", sequence="GATCATCA")
+s <- Seq$new(id = "foo", sequence = "GATCATCA")
 s
 s$sequence
 s$comp()

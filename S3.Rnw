@@ -154,7 +154,7 @@ Explore some of the built-in generics and methods. Try the following commands:\\
 \end{block}
 
 
-\begin{block}{\exercise (code:\code{03_GenericSeq.R}, solution:\code{03_GenericSeq_solution.R})}
+\begin{block}{\exercise}
 \small
 Both \code{length()} and \code{rev()} are already generic functions,
 but \code{alphabet()} is not. 
@@ -221,7 +221,7 @@ class(s.dna)
   \end{block}
 
 <<comp,echo=TRUE>>=
-comp <- function(x, ...){ UseMethod("comp") }
+comp <- function(x, ...) { UseMethod("comp") }
 comp.DnaSeq <- function(x, ...) 
 	chartr("ACGT", "TGCA", seq(x))
 @
@@ -248,7 +248,7 @@ comp(s.dna)
 
 Look at the inheritance code and understand how it works. Then solve the following exercise.
 
-\begin{block}{\exercise (code: \code{04_inherit.R}, solution: \code{04_inherit_solution.R})}
+\begin{block}{\exercise}
 Write the \code{comp()} method for \code{RnaSeq} class. Since we don't have a RNA FASTA
 file you will have to make a new \code{RnaSeq} object by hand and assign the right classes
 to test your code. 
